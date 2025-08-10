@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>NA</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Luxurious+Roman:ital,opsz,wght@1,6..96,700;1,6..96,800&display=swap');
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    html { background: #05070a; }
+    body {
+      margin: 0;
+      height: 100svh;
+      overflow: hidden;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      color: #e6e6f0;
+      background: radial-gradient(1200px 800px at 50% 60%, rgba(14,18,26,0.9), #05070a 75%);
+      overscroll-behavior: none;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      cursor: crosshair;
+    }
+
+    .layer { position: fixed; inset: 0; pointer-events: none; }
+    canvas { display: block; width: 100%; height: 100%; }
+
+    #grain { mix-blend-mode: soft-light; opacity: 0.22; }
+
+    .center { position: fixed; inset: 0; display: grid; place-items: center; pointer-events: none; }
+    .cta {
+      --size: min(18vw, 14rem);
+      position: relative; pointer-events: auto; text-decoration: none;
+      text-transform: uppercase;
+      letter-spacing: 0.25em; font-weight: 700; font-size: clamp(1rem, 2.4vw, 1.6rem);
+      padding: calc(var(--size)/8) calc(var(--size)/6);
+      color: #eaf6ff;
+      isolation: isolate;
+      border-radius: 999px;
+      backdrop-filter: blur(8px) saturate(1.2);
+      -webkit-backdrop-filter: blur(8px) saturate(1.2);
+      background: rgba(10,14,22,0.25);
+      border: 1px solid var(--edge, rgba(102,153,255,0.18));
+      box-shadow:
+        inset 0 0 0 1px var(--edge, rgba(90,120,255,0.15)),
+        0 0 60px var(--glowA, rgba(140,90,255,0.12)),
+        0 0 140px var(--glowB, rgba(50,180,255,0.08));
+      transition: transform 450ms cubic-bezier(.2,.6,0,.99), letter-spacing 450ms cubic-bezier(.2,.6,0,.99);
+      cursor: pointer;
+
+      font-family: 'Bodoni Moda', ui-serif, Georgia, 'Times New Roman', serif;
+      font-style: italic;
+      font-optical-sizing: auto;
+    }
+    .cta:focus-visible { outline: 2px solid #7aa4ff; outline-offset: 3px; }
+
+    .cta::before, .cta::after {
+      content: ""; position: absolute; inset: -28%; border-radius: inherit; z-index: -1;
+      filter: blur(32px); opacity: 0.75; transform: scale(0.98);
+      background:
+        conic-gradient(from 0deg at 50% 50%,
+          rgba(0,0,0,0) 0deg,
+          var(--g1, rgba(96,221,255,.18)) 60deg,
+          var(--g2, rgba(145,86,255,.20)) 160deg,
+          var(--g3, rgba(255,0,190,.18)) 240deg,
+          var(--g4, rgba(0,190,255,.20)) 320deg,
+          rgba(0,0,0,0) 360deg);
+      animation: spin 60s linear infinite; 
+    }
+    .cta::after {
+      inset: -40%; filter: blur(60px); opacity: .35; animation-duration: 140s; animation-direction: reverse;
+      background: conic-gradient(from 180deg at 50% 50%,
+        rgba(0,0,0,0) 0deg,
+        var(--g1, rgba(96,221,255,.10)) 80deg,
+        var(--g2, rgba(145,86,255,.12)) 190deg,
+        var(--g3, rgba(255,0,190,.10)) 280deg,
+        rgba(0,0,0,0) 360deg);
+    }
+
+    @keyframes spin { to { transform: rotate(360deg) scale(1.02); } }
+
+    .cta:hover { transform: translateY(-2px) scale(1.02); letter-spacing: 0.32em; }
+
+    @media (prefers-reduced-motion: reduce) {
+      #gl, #grain { display: none; }
+      .cta::before, .cta::after { animation: none; opacity: .25; }
+      body { background: radial-gradient(800px 600px at 50% 60%, #0b0f16, #05070a 70%); }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="gl" class="layer" aria-hidden="true"></canvas>
+  <canvas id="grain" class="layer" aria-hidden="true"></canvas>
+
+  <div class="center">
+    <a class="cta" href="https://www.linkedin.com/in/naldrich" target="_blank" rel="noopener" role="button" aria-label="Open Nick Aldrich on LinkedIn">
+      NICK&nbsp;ALDRICH
+    </a>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('gl');
+    const gl = canvas.getContext('webgl', { antialias: false, depth: false, stencil: false, alpha: false, powerPreference: 'high-performance', preserveDrawingBuffer: false });
+
+    let dpr = Math.min(window.devicePixelRatio || 1, 2);
+    let use2D = !gl;
+
+    const mouse = { x: 0.5, y: 0.5, t: 0, active: false };
+
+    function resize() {
+      const { innerWidth: w, innerHeight: h } = window;
+      if (!use2D) {
+        const scale = performance.now() < 2000 ? 0.8 : 1.0;
+        const width = Math.floor(w * dpr * scale);
+        const height = Math.floor(h * dpr * scale);
+        if (canvas.width !== width || canvas.height !== height) {
+          canvas.width = width; canvas.height = height;
+          gl.viewport(0, 0, width, height);
+        }
+      } else {
+        const ctx2d = canvas.getContext('2d');
+        canvas.width = Math.floor(w * dpr);
+        canvas.height = Math.floor(h * dpr);
+        ctx2d.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+    }
+
+    function createShader(type, src) { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); if (!gl.getShaderParameter(s, gl.COMPLETE_STATUS) && !gl.getShaderParameter(s, gl.COMPILE_STATUS)) { console.error(gl.getShaderInfoLog(s)); } return s; }
+    function createProgram(vs, fs) { const p = gl.createProgram(); gl.attachShader(p, vs); gl.attachShader(p, fs); gl.linkProgram(p); if (!gl.getProgramParameter(p, gl.LINK_STATUS)) { console.error(gl.getProgramInfoLog(p)); } return p; }
+
+    let program, uTime, uRes, uMouse;
+
+    const ctaEl = document.querySelector('.cta');
+    function clamp01(v){ return Math.max(0, Math.min(1, v)); }
+    function palJS(x){
+      const TAU = Math.PI * 2;
+      const a = [0.05, 0.02, 0.08];
+      const b = [0.10, 0.18, 0.18];
+      const c = [1.00, 1.00, 1.00];
+      const d = [0.48, 0.82, 0.92];
+      const col = [0,0,0];
+      for (let i=0;i<3;i++) col[i] = a[i] + b[i] * Math.cos(TAU * (c[i]*x + d[i]));
+      return col;
+    }
+    function toRGBA(col, alpha){
+      const r = Math.round(255 * clamp01(col[0]));
+      const g = Math.round(255 * clamp01(col[1]));
+      const b = Math.round(255 * clamp01(col[2]));
+      return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    }
+    let lastPaletteUpdate = 0;
+    function updateCTAColors(now){
+      if (!ctaEl) return;
+      if (now - lastPaletteUpdate < 120) return;
+      lastPaletteUpdate = now;
+      const t = now * 0.0003;
+      const m = (mouse.x + (1.0 - mouse.y)) * 0.5;
+      const x0 = 0.55 + 0.45 * Math.cos(t*0.9 + m*2.0);
+      const c1 = palJS(x0);
+      const c2 = palJS(x0 + 0.18);
+      const c3 = palJS(x0 + 0.36);
+      const c4 = palJS(x0 + 0.54);
+      ctaEl.style.setProperty('--g1', toRGBA(c1, 0.22));
+      ctaEl.style.setProperty('--g2', toRGBA(c2, 0.20));
+      ctaEl.style.setProperty('--g3', toRGBA(c3, 0.18));
+      ctaEl.style.setProperty('--g4', toRGBA(c4, 0.20));
+      ctaEl.style.setProperty('--edge', toRGBA(c2, 0.22));
+      ctaEl.style.setProperty('--glowA', toRGBA(c3, 0.14));
+      ctaEl.style.setProperty('--glowB', toRGBA(c4, 0.10));
+    }
+
+    if (!use2D) {
+      const vs = createShader(gl.VERTEX_SHADER, `
+        attribute vec2 p; void main(){ gl_Position = vec4(p, 0.0, 1.0); }
+      `);
+
+      const fs = createShader(gl.FRAGMENT_SHADER, `
+        precision highp float;
+        uniform vec2 u_res;
+        uniform float u_time;
+        uniform vec2 u_mouse;
+        #define TAU 6.28318530718
+        vec2 rot(vec2 p, float a){ float s=sin(a), c=cos(a); return mat2(c,-s,s,c)*p; }
+        
+        vec3 mod289(vec3 x){ return x - floor(x * (1.0 / 289.0)) * 289.0; }
+        vec2 mod289(vec2 x){ return x - floor(x * (1.0 / 289.0)) * 289.0; }
+        vec3 permute(vec3 x){ return mod289(((x*34.0)+1.0)*x); }
+        float snoise(vec2 v){
+          const vec4 C = vec4(0.211324865405187,0.366025403784439,-0.577350269189626,0.024390243902439);
+          vec2 i = floor(v + dot(v, C.yy));
+          vec2 x0 = v - i + dot(i, C.xx);
+          vec2 i1 = (x0.x > x0.y) ? vec2(1.0,0.0) : vec2(0.0,1.0);
+          vec4 x12 = x0.xyxy + C.xxzz; x12.xy -= i1;
+          i = mod289(i);
+          vec3 p = permute( permute( i.y + vec3(0.0, i1.y, 1.0 )) + i.x + vec3(0.0, i1.x, 1.0 ));
+          vec3 m = max(0.5 - vec3(dot(x0,x0), dot(x12.xy,x12.xy), dot(x12.zw,x12.zw)), 0.0);
+          m = m*m; m = m*m;
+          vec3 x = 2.0*fract(p*C.www)-1.0; vec3 h = abs(x)-0.5; vec3 ox = floor(x+0.5); vec3 a0 = x-ox;
+          m *= 1.79284291400159 - 0.85373472095314*(a0*a0 + h*h);
+          vec3 g; g.x = a0.x*x0.x + h.x*x0.y; g.y = a0.y*x12.x + h.y*x12.y; g.z = a0.z*x12.z + h.z*x12.w;
+          return 130.0*dot(m,g);
+        }
+        float fbm(vec2 p){ float a=0.5, f=0.0; vec2 shift=vec2(100.0); for(int i=0;i<5;i++){ f += a*snoise(p); p = rot(p*2.03 + shift, 0.5); a*=0.55; } return f; }
+        float nodes(vec2 uv, float t){ float v=0.0; for(int i=0;i<5;i++){ float fi=float(i); vec2 c=vec2(0.35*sin(t*0.27+fi*1.7), 0.35*sin(t*0.33+fi*2.3+1.2)); float d=length(uv-c); v += 0.015/(d*d+0.0005);} return v; }
+        vec3 palette(float x){ vec3 a=vec3(0.05,0.02,0.08); vec3 b=vec3(0.10,0.18,0.18); vec3 c=vec3(1.0); vec3 d=vec3(0.48,0.82,0.92); return a + b*cos( TAU*(c*x + d) ); }
+        
+        vec2 neuralLens(vec2 uv, vec2 muv, float t){
+          float aspect = u_res.x / u_res.y; vec2 center = vec2((muv.x-0.5)*aspect, (muv.y-0.5));
+          vec2 d = uv - center; float r = length(d); float rad = 0.45; float f = smoothstep(rad, 0.0, r);
+          float swirl = (rad - r) * 0.55 * f; vec2 d2 = rot(d, swirl);
+          float zoom = 1.0 - 0.12*f; return center + d2*zoom;
+        }
+
+        void main(){
+          vec2 R = u_res; vec2 uv = (gl_FragCoord.xy - 0.5*R) / R.y; float t = u_time * 0.0003; 
+          vec2 muv = u_mouse; uv = neuralLens(uv, muv, t);
+
+          vec2 q = uv; float n1 = fbm(q*2.2 + t*0.7); vec2 flow = vec2(fbm(q + 3.0*n1 + t), fbm(q*1.9 - 2.0*n1 - t)); q += 0.22 * (flow - 0.5);
+          float n = fbm(q*3.0 + t*0.8); float ridged = 1.0 - abs(n); ridged = pow(max(ridged,0.0), 2.0);
+          float pot = nodes(uv, t*6.2831853); float field = ridged + pot*0.9;
+
+          float aspect = R.x / R.y; vec2 center = vec2((muv.x-0.5)*aspect, (muv.y-0.5)); float r = length(uv - center);
+          float iris = smoothstep(0.16, 0.12, abs(r - (0.14 + 0.01*sin(t*2.0))));
+
+          float bands = smoothstep(0.25, 1.1, sin(6.0*field + 3.0*n + t*2.0) * 0.5 + 0.5);
+          float glow = pow(bands, 2.5) + smoothstep(0.6, 1.2, field) * 0.35 + iris*0.12;
+
+          float rC = glow * (0.85 + 0.15*sin(uv.x*5.0 + t*2.0));
+          float gC = (pow(bands, 2.0) + 0.3*glow);
+          float bC = (pow(bands, 1.5) + 0.15*glow);
+          vec3 col = vec3(rC, gC, bC);
+          col *= palette(0.55 + 0.45*fbm(q*1.25 - t*0.3));
+          float vign = smoothstep(1.2, 0.15, length(uv)); col *= vign; col *= 0.92 + 0.08*sin(gl_FragCoord.y*0.5 + t*60.0);
+          col = pow(col, vec3(1.0/1.2)); gl_FragColor = vec4(col, 1.0);
+        }
+      `);
+
+      const programVSFS = createProgram(vs, fs); program = programVSFS; gl.useProgram(program);
+      const loc = gl.getAttribLocation(program, 'p'); const buffer = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 3,-1, -1,3]), gl.STATIC_DRAW);
+      gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+
+      uTime = gl.getUniformLocation(program, 'u_time'); uRes = gl.getUniformLocation(program, 'u_res'); uMouse = gl.getUniformLocation(program, 'u_mouse');
+    }
+
+    const grainCanvas = document.getElementById('grain');
+    const gctx = grainCanvas.getContext('2d', { alpha: true });
+    function resizeGrain(){ const { innerWidth: w, innerHeight: h } = window; grainCanvas.width = Math.floor(w * dpr); grainCanvas.height = Math.floor(h * dpr); }
+    function drawGrain(){ const w = grainCanvas.width, h = grainCanvas.height; const id = gctx.createImageData(w, h); const data = id.data; for (let i = 0; i < data.length; i+=4) { const v = (Math.random()*255)|0; data[i]=v; data[i+1]=v; data[i+2]=v; data[i+3]=10; } gctx.putImageData(id, 0, 0); }
+
+    let last = performance.now(); let acc = 0, frames = 0;
+    function animate(now){
+      (function updateCTA(now2){
+        const nowLocal = now2; if (!ctaEl) return; if (nowLocal - lastPaletteUpdate < 120) return; lastPaletteUpdate = nowLocal;
+        const t = nowLocal * 0.0003; const m = (mouse.x + (1.0 - mouse.y)) * 0.5; const x0 = 0.55 + 0.45 * Math.cos(t*0.9 + m*2.0);
+        const c1 = palJS(x0), c2 = palJS(x0 + 0.18), c3 = palJS(x0 + 0.36), c4 = palJS(x0 + 0.54);
+        ctaEl.style.setProperty('--g1', toRGBA(c1, 0.22)); ctaEl.style.setProperty('--g2', toRGBA(c2, 0.20)); ctaEl.style.setProperty('--g3', toRGBA(c3, 0.18)); ctaEl.style.setProperty('--g4', toRGBA(c4, 0.20));
+        ctaEl.style.setProperty('--edge', toRGBA(c2, 0.22)); ctaEl.style.setProperty('--glowA', toRGBA(c3, 0.14)); ctaEl.style.setProperty('--glowB', toRGBA(c4, 0.10));
+      })(now);
+
+      if (document.hidden) { requestAnimationFrame(animate); return; }
+      const dt = now - last; last = now; acc += dt; frames++;
+      if (!use2D) {
+        gl.uniform2f(uRes, canvas.width, canvas.height); gl.uniform1f(uTime, now); gl.uniform2f(uMouse, mouse.x, 1.0 - mouse.y); gl.drawArrays(gl.TRIANGLES, 0, 3);
+      } else {
+        const ctx = canvas.getContext('2d'); const { width: w, height: h } = canvas; ctx.clearRect(0, 0, w, h);
+        const t = now * 0.00008; for (let i=0; i<140; i++){ const a = i/140 * Math.PI*2 + t*2; const r = Math.min(w,h)*0.25 + Math.sin(t*3 + i)*36; const x = w/2 + Math.cos(a)*r; const y = h/2 + Math.sin(a)*r; ctx.fillStyle = `hsla(${(i*2 + now*0.02)%360}, 80%, 60%, 0.06)`; ctx.beginPath(); ctx.arc(x, y, 2, 0, Math.PI*2); ctx.fill(); }
+      }
+      if (now % 80 < 16) drawGrain();
+      if (acc > 1000) { const fps = frames * 1000 / acc; acc = 0; frames = 0; if (fps < 30 && dpr > 1) { dpr = Math.max(0.75, dpr - 0.25); resize(); resizeGrain(); } }
+      requestAnimationFrame(animate);
+    }
+
+    function onMove(e){ mouse.active = true; const rect = canvas.getBoundingClientRect(); mouse.x = ((e.touches ? e.touches[0].clientX : e.clientX) - rect.left) / rect.width; mouse.y = ((e.touches ? e.touches[0].clientY : e.clientY) - rect.top) / rect.height; }
+    window.addEventListener('mousemove', onMove, { passive: true }); window.addEventListener('touchmove', onMove, { passive: true });
+
+    window.addEventListener('resize', () => { resize(); resizeGrain(); }); resize(); resizeGrain(); if (!use2D) { try { gl.clear(gl.COLOR_BUFFER_BIT); } catch (e) { use2D = true; } } requestAnimationFrame(animate);
+  </script>
+</body>
+</html>
