@@ -3,9 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>NA</title>
+  <title>Nick Aldrich</title>
+  <meta name="description" content="A neural, dark, surrealist, pseudo‑minimal landing experience." />
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Luxurious+Roman:ital,opsz,wght@1,6..96,700;1,6..96,800&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&display=swap');
 
     * { box-sizing: border-box; }
     html, body { height: 100%; }
@@ -28,7 +29,7 @@
 
     #grain { mix-blend-mode: soft-light; opacity: 0.22; }
 
-    .center { position: fixed; inset: 0; display: grid; place-items: center; pointer-events: none; }
+    .center { position: fixed; inset: 0; display: grid; place-items: center; pointer-events: none; z-index: 3; transition: padding 600ms cubic-bezier(.2,.6,0,.99); }
     .cta {
       --size: min(18vw, 14rem);
       position: relative; pointer-events: auto; text-decoration: none;
@@ -49,9 +50,10 @@
       transition: transform 450ms cubic-bezier(.2,.6,0,.99), letter-spacing 450ms cubic-bezier(.2,.6,0,.99);
       cursor: pointer;
 
-      font-family: 'Bodoni Moda', ui-serif, Georgia, 'Times New Roman', serif;
-      font-style: italic;
-      font-optical-sizing: auto;
+      font-family: 'Cinzel', ui-serif, Georgia, 'Times New Roman', serif;
+      font-style: normal;
+      font-variant-caps: small-caps;
+      font-feature-settings: "smcp" 1, "c2sc" 1;
     }
     .cta:focus-visible { outline: 2px solid #7aa4ff; outline-offset: 3px; }
 
@@ -66,7 +68,7 @@
           var(--g3, rgba(255,0,190,.18)) 240deg,
           var(--g4, rgba(0,190,255,.20)) 320deg,
           rgba(0,0,0,0) 360deg);
-      animation: spin 60s linear infinite; 
+      animation: spin 60s linear infinite;
     }
     .cta::after {
       inset: -40%; filter: blur(60px); opacity: .35; animation-duration: 140s; animation-direction: reverse;
@@ -87,6 +89,26 @@
       .cta::before, .cta::after { animation: none; opacity: .25; }
       body { background: radial-gradient(800px 600px at 50% 60%, #0b0f16, #05070a 70%); }
     }
+    .center.pinned { place-items: start center; padding-top: clamp(32px, 9vh, 96px); }
+
+    .info { position: fixed; inset: 0; display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: clamp(16px, 2.5vw, 40px); align-content: start; padding: min(28vh, 220px) clamp(24px, 6vw, 80px) clamp(24px, 8vh, 120px); pointer-events: none; z-index: 2; }
+    .info .card { opacity: 0; transform: translateY(10px); transition: opacity .5s ease, transform .5s ease; }
+    .info.show { pointer-events: none; }
+    .info.show .card { opacity: 1; transform: translateY(0); }
+    .info.show .card:nth-child(1){ transition-delay: 0s; }
+    .info.show .card:nth-child(2){ transition-delay: .12s; }
+    .info.show .card:nth-child(3){ transition-delay: .24s; }
+    .info.reverse .card:nth-child(1){ transition-delay: .24s; }
+    .info.reverse .card:nth-child(2){ transition-delay: .12s; }
+    .info.reverse .card:nth-child(3){ transition-delay: 0s; }
+
+    .card h2 { margin: 0 0 .25rem 0; font-size: clamp(1rem, 1.4vw, 1.25rem); opacity: .9; }
+    .card h3 { margin: 0 0 .35rem 0; font-size: clamp(.9rem, 1.2vw, 1.1rem); font-weight: 700; opacity: .95; }
+    .card p  { margin: 0 0 .25rem 0; opacity: .85; }
+
+    @media (max-width: 860px){
+      .info { grid-template-columns: 1fr; padding: min(24vh, 180px) 20px 24px; gap: 14px; }
+    }
   </style>
 </head>
 <body>
@@ -97,6 +119,30 @@
     <a class="cta" href="https://www.linkedin.com/in/naldrich" target="_blank" rel="noopener" role="button" aria-label="Open Nick Aldrich on LinkedIn">
       NICK&nbsp;ALDRICH
     </a>
+  </div>
+
+  <div class="info" aria-hidden="true">
+    <section class="card">
+      <h2>2020–2024</h2>
+      <h3>Choate Rosemary Hall</h3>
+      <p>4.22 GPA</p>
+      <p>1 of 8 early inductees into the Cum Laude Society</p>
+      <p>JFK Program in Government and Politics</p>
+    </section>
+    <section class="card">
+      <h2>2024–2025</h2>
+      <h3>University of Southern California</h3>
+      <p>3.6 GPA | Philosophy, Politics, and Economics</p>
+      <p>Minors in Psychology &amp; Law; Classics</p>
+      <p>Lambda Chi Alpha</p>
+    </section>
+    <section class="card">
+      <h2>2025–present</h2>
+      <h3>Conduit Intelligence</h3>
+      <p>Founding Member of Staff</p>
+      <p>Building thought-to-text technology</p>
+      <p>Strategy, Investor Relations, Operations</p>
+    </section>
   </div>
 
   <script>
@@ -126,7 +172,7 @@
       }
     }
 
-    function createShader(type, src) { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); if (!gl.getShaderParameter(s, gl.COMPLETE_STATUS) && !gl.getShaderParameter(s, gl.COMPILE_STATUS)) { console.error(gl.getShaderInfoLog(s)); } return s; }
+    function createShader(type, src) { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) { console.error(gl.getShaderInfoLog(s)); } return s; }
     function createProgram(vs, fs) { const p = gl.createProgram(); gl.attachShader(p, vs); gl.attachShader(p, fs); gl.linkProgram(p); if (!gl.getProgramParameter(p, gl.LINK_STATUS)) { console.error(gl.getProgramInfoLog(p)); } return p; }
 
     let program, uTime, uRes, uMouse;
@@ -201,81 +247,187 @@
           vec3 g; g.x = a0.x*x0.x + h.x*x0.y; g.y = a0.y*x12.x + h.y*x12.y; g.z = a0.z*x12.z + h.z*x12.w;
           return 130.0*dot(m,g);
         }
-        float fbm(vec2 p){ float a=0.5, f=0.0; vec2 shift=vec2(100.0); for(int i=0;i<5;i++){ f += a*snoise(p); p = rot(p*2.03 + shift, 0.5); a*=0.55; } return f; }
-        float nodes(vec2 uv, float t){ float v=0.0; for(int i=0;i<5;i++){ float fi=float(i); vec2 c=vec2(0.35*sin(t*0.27+fi*1.7), 0.35*sin(t*0.33+fi*2.3+1.2)); float d=length(uv-c); v += 0.015/(d*d+0.0005);} return v; }
-        vec3 palette(float x){ vec3 a=vec3(0.05,0.02,0.08); vec3 b=vec3(0.10,0.18,0.18); vec3 c=vec3(1.0); vec3 d=vec3(0.48,0.82,0.92); return a + b*cos( TAU*(c*x + d) ); }
+        float fbm(vec2 p){
+          float a=0.5, f=0.0; vec2 shift=vec2(100.0);
+          for(int i=0;i<5;i++){ f += a*snoise(p); p = rot(p*2.03 + shift, 0.5); a*=0.55; }
+          return f;
+        }
+        float nodes(vec2 uv, float t){
+          float v=0.0; for(int i=0;i<5;i++){
+            float fi=float(i);
+            vec2 c=vec2(0.35*sin(t*0.27+fi*1.7), 0.35*sin(t*0.33+fi*2.3+1.2));
+            float d=length(uv-c); v += 0.015/(d*d+0.0005);
+          } return v;
+        }
+        vec3 palette(float x){
+          vec3 a=vec3(0.05,0.02,0.08); vec3 b=vec3(0.10,0.18,0.18); vec3 c=vec3(1.0); vec3 d=vec3(0.48,0.82,0.92);
+          return a + b*cos( TAU*(c*x + d) );
+        }
         
         vec2 neuralLens(vec2 uv, vec2 muv, float t){
-          float aspect = u_res.x / u_res.y; vec2 center = vec2((muv.x-0.5)*aspect, (muv.y-0.5));
-          vec2 d = uv - center; float r = length(d); float rad = 0.45; float f = smoothstep(rad, 0.0, r);
-          float swirl = (rad - r) * 0.55 * f; vec2 d2 = rot(d, swirl);
-          float zoom = 1.0 - 0.12*f; return center + d2*zoom;
+          float aspect = u_res.x / u_res.y;
+          vec2 center = vec2( (muv.x - 0.5)*aspect, (muv.y - 0.5) );
+          vec2 d = uv - center;
+          float r = length(d);
+          float rad = 0.45;
+          float f = smoothstep(rad, 0.0, r);
+          float swirl = (rad - r) * 0.55 * f;
+          vec2 d2 = rot(d, swirl);
+          float zoom = 1.0 - 0.12*f;
+          vec2 warped = center + d2*zoom;
+          return warped;
         }
 
         void main(){
-          vec2 R = u_res; vec2 uv = (gl_FragCoord.xy - 0.5*R) / R.y; float t = u_time * 0.0003; 
-          vec2 muv = u_mouse; uv = neuralLens(uv, muv, t);
+          vec2 R = u_res;
+          vec2 uv = (gl_FragCoord.xy - 0.5*R) / R.y;
+          float t = u_time * 0.0003;
 
-          vec2 q = uv; float n1 = fbm(q*2.2 + t*0.7); vec2 flow = vec2(fbm(q + 3.0*n1 + t), fbm(q*1.9 - 2.0*n1 - t)); q += 0.22 * (flow - 0.5);
-          float n = fbm(q*3.0 + t*0.8); float ridged = 1.0 - abs(n); ridged = pow(max(ridged,0.0), 2.0);
-          float pot = nodes(uv, t*6.2831853); float field = ridged + pot*0.9;
+          vec2 muv = u_mouse; 
+          uv = neuralLens(uv, muv, t);
 
-          float aspect = R.x / R.y; vec2 center = vec2((muv.x-0.5)*aspect, (muv.y-0.5)); float r = length(uv - center);
+          vec2 q = uv;
+          float n1 = fbm(q*2.2 + t*0.7);
+          vec2 flow = vec2(fbm(q + 3.0*n1 + t), fbm(q*1.9 - 2.0*n1 - t));
+          q += 0.22 * (flow - 0.5);
+
+          float n = fbm(q*3.0 + t*0.8);
+          float ridged = 1.0 - abs(n); ridged = pow(max(ridged,0.0), 2.0);
+          float pot = nodes(uv, t*TAU);
+          float field = ridged + pot*0.9;
+
+          float aspect = R.x / R.y;
+          vec2 center = vec2( (muv.x - 0.5)*aspect, (muv.y - 0.5) );
+          float r = length(uv - center);
           float iris = smoothstep(0.16, 0.12, abs(r - (0.14 + 0.01*sin(t*2.0))));
 
           float bands = smoothstep(0.25, 1.1, sin(6.0*field + 3.0*n + t*2.0) * 0.5 + 0.5);
           float glow = pow(bands, 2.5) + smoothstep(0.6, 1.2, field) * 0.35 + iris*0.12;
 
+          vec2 off = 0.0015 * vec2(uv.y, -uv.x);
           float rC = glow * (0.85 + 0.15*sin(uv.x*5.0 + t*2.0));
           float gC = (pow(bands, 2.0) + 0.3*glow);
           float bC = (pow(bands, 1.5) + 0.15*glow);
           vec3 col = vec3(rC, gC, bC);
           col *= palette(0.55 + 0.45*fbm(q*1.25 - t*0.3));
-          float vign = smoothstep(1.2, 0.15, length(uv)); col *= vign; col *= 0.92 + 0.08*sin(gl_FragCoord.y*0.5 + t*60.0);
-          col = pow(col, vec3(1.0/1.2)); gl_FragColor = vec4(col, 1.0);
+          float vign = smoothstep(1.2, 0.15, length(uv));
+          col *= vign;
+          col *= 0.92 + 0.08*sin(gl_FragCoord.y*0.5 + t*60.0);
+          col = pow(col, vec3(1.0/1.2));
+          gl_FragColor = vec4(col, 1.0);
         }
       `);
 
-      const programVSFS = createProgram(vs, fs); program = programVSFS; gl.useProgram(program);
-      const loc = gl.getAttribLocation(program, 'p'); const buffer = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+      program = createProgram(vs, fs);
+      gl.useProgram(program);
+      const loc = gl.getAttribLocation(program, 'p');
+      const buffer = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
       gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 3,-1, -1,3]), gl.STATIC_DRAW);
       gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
 
-      uTime = gl.getUniformLocation(program, 'u_time'); uRes = gl.getUniformLocation(program, 'u_res'); uMouse = gl.getUniformLocation(program, 'u_mouse');
+      uTime = gl.getUniformLocation(program, 'u_time');
+      uRes = gl.getUniformLocation(program, 'u_res');
+      uMouse = gl.getUniformLocation(program, 'u_mouse');
     }
 
     const grainCanvas = document.getElementById('grain');
     const gctx = grainCanvas.getContext('2d', { alpha: true });
     function resizeGrain(){ const { innerWidth: w, innerHeight: h } = window; grainCanvas.width = Math.floor(w * dpr); grainCanvas.height = Math.floor(h * dpr); }
-    function drawGrain(){ const w = grainCanvas.width, h = grainCanvas.height; const id = gctx.createImageData(w, h); const data = id.data; for (let i = 0; i < data.length; i+=4) { const v = (Math.random()*255)|0; data[i]=v; data[i+1]=v; data[i+2]=v; data[i+3]=10; } gctx.putImageData(id, 0, 0); }
+    function drawGrain(){
+      const w = grainCanvas.width, h = grainCanvas.height;
+      const id = gctx.createImageData(w, h); const data = id.data;
+      for (let i = 0; i < data.length; i+=4) { const v = (Math.random()*255)|0; data[i]=v; data[i+1]=v; data[i+2]=v; data[i+3]=10; }
+      gctx.putImageData(id, 0, 0);
+    }
 
     let last = performance.now(); let acc = 0, frames = 0;
-    function animate(now){
-      (function updateCTA(now2){
-        const nowLocal = now2; if (!ctaEl) return; if (nowLocal - lastPaletteUpdate < 120) return; lastPaletteUpdate = nowLocal;
-        const t = nowLocal * 0.0003; const m = (mouse.x + (1.0 - mouse.y)) * 0.5; const x0 = 0.55 + 0.45 * Math.cos(t*0.9 + m*2.0);
-        const c1 = palJS(x0), c2 = palJS(x0 + 0.18), c3 = palJS(x0 + 0.36), c4 = palJS(x0 + 0.54);
-        ctaEl.style.setProperty('--g1', toRGBA(c1, 0.22)); ctaEl.style.setProperty('--g2', toRGBA(c2, 0.20)); ctaEl.style.setProperty('--g3', toRGBA(c3, 0.18)); ctaEl.style.setProperty('--g4', toRGBA(c4, 0.20));
-        ctaEl.style.setProperty('--edge', toRGBA(c2, 0.22)); ctaEl.style.setProperty('--glowA', toRGBA(c3, 0.14)); ctaEl.style.setProperty('--glowB', toRGBA(c4, 0.10));
-      })(now);
 
+    const centerEl = document.querySelector('.center');
+    const infoEl = document.querySelector('.info');
+    let infoOpen = false;
+    const CTA_MS = 700;
+    const CARDS_MS = 500;
+    const STAGGER_MS = 120;
+
+    function flipCTA(pinning, done){
+      const first = ctaEl.getBoundingClientRect();
+      if (pinning) centerEl.classList.add('pinned'); else centerEl.classList.remove('pinned');
+      const last = ctaEl.getBoundingClientRect();
+      const dx = first.left - last.left;
+      const dy = first.top - last.top;
+      const sx = first.width / last.width;
+      const sy = first.height / last.height;
+      const anim = ctaEl.animate([
+        { transform: `translate(${dx}px, ${dy}px) scale(${sx}, ${sy})` },
+        { transform: 'none' }
+      ], { duration: CTA_MS, easing: 'cubic-bezier(.2,.6,0,.99)', fill: 'both' });
+      anim.onfinish = () => { if (done) done(); };
+    }
+
+    function showInfo(){
+      infoEl.classList.remove('reverse');
+      infoEl.classList.remove('show');
+      infoEl.setAttribute('aria-hidden','true');
+      flipCTA(true, () => {
+        infoEl.classList.add('show');
+        infoEl.setAttribute('aria-hidden','false');
+      });
+    }
+
+    function hideInfo(){
+      infoEl.classList.add('reverse');
+      void infoEl.offsetWidth;
+      infoEl.classList.remove('show');
+      infoEl.setAttribute('aria-hidden','true');
+      const wait = CARDS_MS + 2*STAGGER_MS;
+      setTimeout(() => {
+        flipCTA(false, () => { infoEl.classList.remove('reverse'); });
+      }, wait);
+    }
+
+    ctaEl.addEventListener('click', (e) => {
+      e.preventDefault();
+      infoOpen ? hideInfo() : showInfo();
+      infoOpen = !infoOpen;
+    });
+    function animate(now){
+      updateCTAColors(now);
       if (document.hidden) { requestAnimationFrame(animate); return; }
       const dt = now - last; last = now; acc += dt; frames++;
       if (!use2D) {
-        gl.uniform2f(uRes, canvas.width, canvas.height); gl.uniform1f(uTime, now); gl.uniform2f(uMouse, mouse.x, 1.0 - mouse.y); gl.drawArrays(gl.TRIANGLES, 0, 3);
+        gl.uniform2f(uRes, canvas.width, canvas.height);
+        gl.uniform1f(uTime, now);
+        gl.uniform2f(uMouse, mouse.x, 1.0 - mouse.y);
+        gl.drawArrays(gl.TRIANGLES, 0, 3);
       } else {
         const ctx = canvas.getContext('2d'); const { width: w, height: h } = canvas; ctx.clearRect(0, 0, w, h);
-        const t = now * 0.00008; for (let i=0; i<140; i++){ const a = i/140 * Math.PI*2 + t*2; const r = Math.min(w,h)*0.25 + Math.sin(t*3 + i)*36; const x = w/2 + Math.cos(a)*r; const y = h/2 + Math.sin(a)*r; ctx.fillStyle = `hsla(${(i*2 + now*0.02)%360}, 80%, 60%, 0.06)`; ctx.beginPath(); ctx.arc(x, y, 2, 0, Math.PI*2); ctx.fill(); }
+        const t = now * 0.00008;
+        for (let i=0; i<140; i++){
+          const a = i/140 * Math.PI*2 + t*2;
+          const r = Math.min(w,h)*0.25 + Math.sin(t*3 + i)*36;
+          const x = w/2 + Math.cos(a)*r; const y = h/2 + Math.sin(a)*r;
+          ctx.fillStyle = `hsla(${(i*2 + now*0.02)%360}, 80%, 60%, 0.06)`;
+          ctx.beginPath(); ctx.arc(x, y, 2, 0, Math.PI*2); ctx.fill();
+        }
       }
       if (now % 80 < 16) drawGrain();
       if (acc > 1000) { const fps = frames * 1000 / acc; acc = 0; frames = 0; if (fps < 30 && dpr > 1) { dpr = Math.max(0.75, dpr - 0.25); resize(); resizeGrain(); } }
       requestAnimationFrame(animate);
     }
 
-    function onMove(e){ mouse.active = true; const rect = canvas.getBoundingClientRect(); mouse.x = ((e.touches ? e.touches[0].clientX : e.clientX) - rect.left) / rect.width; mouse.y = ((e.touches ? e.touches[0].clientY : e.clientY) - rect.top) / rect.height; }
-    window.addEventListener('mousemove', onMove, { passive: true }); window.addEventListener('touchmove', onMove, { passive: true });
+    function onMove(e){
+      mouse.active = true;
+      const rect = canvas.getBoundingClientRect();
+      mouse.x = ( (e.touches ? e.touches[0].clientX : e.clientX) - rect.left ) / rect.width;
+      mouse.y = ( (e.touches ? e.touches[0].clientY : e.clientY) - rect.top ) / rect.height;
+    }
+    window.addEventListener('mousemove', onMove, { passive: true });
+    window.addEventListener('touchmove', onMove, { passive: true });
 
-    window.addEventListener('resize', () => { resize(); resizeGrain(); }); resize(); resizeGrain(); if (!use2D) { try { gl.clear(gl.COLOR_BUFFER_BIT); } catch (e) { use2D = true; } } requestAnimationFrame(animate);
+    window.addEventListener('resize', () => { resize(); resizeGrain(); });
+    resize(); resizeGrain();
+    if (!use2D) { try { gl.clear(gl.COLOR_BUFFER_BIT); } catch (e) { use2D = true; } }
+    requestAnimationFrame(animate);
   </script>
 </body>
 </html>
