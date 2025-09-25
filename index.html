@@ -15,19 +15,38 @@
 
       body {
         margin: 0;
-        background: var(--bg);
+        background: none;
         color: var(--fg);
         font-family: ui-monospace, "SFMono-Regular", "SF Mono", Menlo, Monaco, Consolas,
           "Liberation Mono", "DejaVu Sans Mono", "Courier New", monospace;
         display: grid;
         place-items: center;
+        position: relative;
       }
+
+      body::before,
+      body::after {
+        content: "";
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        pointer-events: none;
+      }
+
+      body::before { background: #002405; }
+      body::after  { background: #001403; animation: color-fade 3s ease-in-out infinite alternate; }
 
       main {
         width: 21vw;
         display: grid;
         gap: 2rem;
         text-align: center;
+      }
+
+      /* Smooth crossfade between two background colors */
+      @keyframes color-fade {
+        0%   { opacity: 0; }
+        100% { opacity: 1; }
       }
 
       p {
