@@ -4,14 +4,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Nick Aldrich</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet" />
     <style>
       :root {
         --bg: #002405;
-        --fg: #c0c0c0;
-        --fg-hover: #917824;
+        --line: #c8cec8;
+        --gold: #ffce54;
       }
 
       html, body { height: 100%; }
@@ -19,8 +16,6 @@
       body {
         margin: 0;
         background: none;
-        color: var(--fg);
-        font-family: "Cormorant Garamond", Baskerville, Garamond, serif;
         display: grid;
         place-items: center;
         position: relative;
@@ -38,96 +33,246 @@
       body::before { background: #002405; }
       body::after  { background: #001403; animation: color-fade 3s ease-in-out infinite alternate; }
 
-      main {
-        width: 21vw;
-        display: grid;
-        gap: 1rem;
-        text-align: center;
-      }
-
-      @media (max-width: 768px) {
-        main {
-          width: 85vw;
-          padding: 0 1rem;
-        }
-      }
-
       /* Smooth crossfade between two background colors */
       @keyframes color-fade {
         0%   { opacity: 0; }
         100% { opacity: 1; }
       }
 
-      p {
-        margin: 0;
-        line-height: 1.45;
-        font-size: clamp(16px, 1.3vw, 22px);
+      main {
+        width: clamp(300px, 27vw, 640px);
       }
 
-      a {
-        color: inherit;
-        text-decoration: none;
-        transition: color 0.15s ease-in-out;
+      @media (max-width: 768px) {
+        main { width: 85vw; }
+      }
+
+      #art {
         position: relative;
+        width: 100%;
+        aspect-ratio: 700 / 550;
       }
 
-      a:hover,
-      a:focus-visible { color: var(--fg-hover); }
-
-      @supports ((-webkit-background-clip: text) or (background-clip: text)) {
-        a {
-          color: transparent;
-          background-image:
-            linear-gradient(
-              120deg,
-              rgba(255, 255, 255, 0) 0%,
-              rgba(255, 255, 255, 0.25) 38%,
-              rgba(255, 255, 255, 0.95) 50%,
-              rgba(255, 255, 255, 0.25) 62%,
-              rgba(255, 255, 255, 0) 100%
-            ),
-            linear-gradient(#c0c0c0, #c0c0c0);
-          background-size: 200% 100%, 100% 100%;
-          background-repeat: no-repeat;
-          background-position: 120% 0, 0 0;
-          -webkit-background-clip: text;
-          background-clip: text;
-          -webkit-text-fill-color: transparent;
-          animation: link-shimmer 4.5s linear infinite;
-        }
-
-        a:hover,
-        a:focus-visible {
-          background-image: none;
-          color: var(--fg-hover);
-          -webkit-text-fill-color: var(--fg-hover);
-          animation-play-state: paused;
-        }
-
-        @keyframes link-shimmer {
-          from {
-            background-position: 120% 0, 0 0;
-          }
-          to {
-            background-position: -120% 0, 0 0;
-          }
-        }
+      #art svg,
+      #art canvas {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        display: block;
       }
+
+      #art svg { opacity: 0.85; transition: opacity 0.7s ease; }
+      #art:hover svg { opacity: 1; }
     </style>
   </head>
   <body>
     <main>
-      <p>
-        hey, i'm
-        <a href="https://www.linkedin.com/in/naldrich" target="_blank" rel="noopener noreferrer">nick aldrich</a>.
-      </p>
-      <p>
-        currently, i'm building thought-to-text at
-        <a href="https://condu.it" target="_blank" rel="noopener noreferrer">Conduit Intelligence</a>.
-        on a leave of absence from my PPE studies at USC, where i do economic research at
-        <a href="https://dornsife.usc.edu/cesr/labarometer" target="_blank" rel="noopener noreferrer">CESR</a>.
-      </p>
+      <div id="art" role="img" aria-label="stereographic projection of EEG sensors with correlation edges">
+        <svg id="net" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 550"></svg>
+        <canvas id="fx"></canvas>
+        <canvas id="fx2"></canvas>
+      </div>
     </main>
+
+    <script>
+      // 28 EEG sensors, stereographically projected; edges where |corr| > 0.45
+      const G = {"nodes":[[-0.2091,1.3608],[0.3438,1.0728],[-1.0406,1.3545],[-0.4826,2.4511],[0.8891,2.1354],[1.0123,1.1587],[0.6813,0.6717],[-1.962,2.0927],[0.8541,4.0394],[1.8281,1.4874],[1.1286,0.6113],[-2.2011,0.4882],[-5.2996,5.853],[4.0301,2.087],[1.837,0.4307],[0.9438,0.1623],[-4.1534,-1.1895],[11.4284,-7.071],[2.8405,-0.363],[1.3892,-0.1806],[-1.8771,-1.5059],[-1.3276,-4.9793],[2.781,-2.633],[1.7513,-0.8769],[0.9927,-0.5149],[-0.1953,-2.0314],[0.4734,-1.8016],[0.7604,-1.3074]],"edges":[[0,1,1.0],[0,2,1.0],[0,3,1.0],[0,4,1.0],[0,5,1.0],[0,6,1.0],[0,7,1.0],[0,8,1.0],[0,9,1.0],[0,10,1.0],[0,11,1.0],[0,12,1.0],[0,13,1.0],[0,14,1.0],[0,15,1.0],[0,16,1.0],[0,17,1.0],[0,18,1.0],[0,19,1.0],[0,20,1.0],[0,21,0.61],[0,22,0.991],[0,23,0.908],[0,24,1.0],[0,25,0.997],[0,26,1.0],[1,2,1.0],[1,3,1.0],[1,4,1.0],[1,5,1.0],[1,6,1.0],[1,7,1.0],[1,8,1.0],[1,9,1.0],[1,10,1.0],[1,11,1.0],[1,12,1.0],[1,13,1.0],[1,14,1.0],[1,15,1.0],[1,16,1.0],[1,17,1.0],[1,18,1.0],[1,19,1.0],[1,20,1.0],[1,21,0.611],[1,22,0.991],[1,23,0.908],[1,24,1.0],[1,25,0.997],[1,26,1.0],[2,3,1.0],[2,4,1.0],[2,5,1.0],[2,6,1.0],[2,7,1.0],[2,8,1.0],[2,9,1.0],[2,10,1.0],[2,11,1.0],[2,12,1.0],[2,13,1.0],[2,14,1.0],[2,15,1.0],[2,16,1.0],[2,17,1.0],[2,18,1.0],[2,19,1.0],[2,20,1.0],[2,21,0.611],[2,22,0.991],[2,23,0.909],[2,24,1.0],[2,25,0.997],[2,26,1.0],[3,4,1.0],[3,5,1.0],[3,6,1.0],[3,7,1.0],[3,8,1.0],[3,9,1.0],[3,10,1.0],[3,11,1.0],[3,12,1.0],[3,13,1.0],[3,14,1.0],[3,15,1.0],[3,16,1.0],[3,17,1.0],[3,18,1.0],[3,19,1.0],[3,20,1.0],[3,21,0.612],[3,22,0.991],[3,23,0.909],[3,24,1.0],[3,25,0.997],[3,26,1.0],[4,5,1.0],[4,6,1.0],[4,7,1.0],[4,8,1.0],[4,9,1.0],[4,10,1.0],[4,11,1.0],[4,12,1.0],[4,13,1.0],[4,14,1.0],[4,15,1.0],[4,16,1.0],[4,17,1.0],[4,18,1.0],[4,19,1.0],[4,20,1.0],[4,21,0.611],[4,22,0.991],[4,23,0.909],[4,24,1.0],[4,25,0.997],[4,26,1.0],[5,6,1.0],[5,7,1.0],[5,8,1.0],[5,9,1.0],[5,10,1.0],[5,11,1.0],[5,12,1.0],[5,13,1.0],[5,14,1.0],[5,15,1.0],[5,16,1.0],[5,17,1.0],[5,18,1.0],[5,19,1.0],[5,20,1.0],[5,21,0.611],[5,22,0.991],[5,23,0.909],[5,24,1.0],[5,25,0.997],[5,26,1.0],[6,7,1.0],[6,8,1.0],[6,9,1.0],[6,10,1.0],[6,11,1.0],[6,12,1.0],[6,13,1.0],[6,14,1.0],[6,15,1.0],[6,16,1.0],[6,17,1.0],[6,18,1.0],[6,19,1.0],[6,20,1.0],[6,21,0.611],[6,22,0.991],[6,23,0.909],[6,24,1.0],[6,25,0.997],[6,26,1.0],[7,8,1.0],[7,9,1.0],[7,10,1.0],[7,11,1.0],[7,12,1.0],[7,13,1.0],[7,14,1.0],[7,15,1.0],[7,16,1.0],[7,17,1.0],[7,18,1.0],[7,19,1.0],[7,20,1.0],[7,21,0.61],[7,22,0.991],[7,23,0.91],[7,24,1.0],[7,25,0.997],[7,26,1.0],[8,9,1.0],[8,10,1.0],[8,11,0.999],[8,12,1.0],[8,13,1.0],[8,14,1.0],[8,15,1.0],[8,16,1.0],[8,17,0.999],[8,18,1.0],[8,19,1.0],[8,20,1.0],[8,21,0.609],[8,22,0.99],[8,23,0.912],[8,24,0.999],[8,25,0.996],[8,26,1.0],[9,10,1.0],[9,11,1.0],[9,12,1.0],[9,13,1.0],[9,14,1.0],[9,15,1.0],[9,16,1.0],[9,17,1.0],[9,18,1.0],[9,19,1.0],[9,20,1.0],[9,21,0.61],[9,22,0.99],[9,23,0.908],[9,24,1.0],[9,25,0.997],[9,26,1.0],[10,11,1.0],[10,12,1.0],[10,13,1.0],[10,14,1.0],[10,15,1.0],[10,16,1.0],[10,17,1.0],[10,18,1.0],[10,19,1.0],[10,20,1.0],[10,21,0.611],[10,22,0.991],[10,23,0.909],[10,24,1.0],[10,25,0.997],[10,26,1.0],[11,12,1.0],[11,13,1.0],[11,14,0.999],[11,15,1.0],[11,16,1.0],[11,17,1.0],[11,18,1.0],[11,19,1.0],[11,20,1.0],[11,21,0.615],[11,22,0.99],[11,23,0.907],[11,24,1.0],[11,25,0.997],[11,26,1.0],[12,13,1.0],[12,14,1.0],[12,15,1.0],[12,16,1.0],[12,17,1.0],[12,18,1.0],[12,19,1.0],[12,20,1.0],[12,21,0.611],[12,22,0.991],[12,23,0.909],[12,24,1.0],[12,25,0.997],[12,26,1.0],[13,14,1.0],[13,15,1.0],[13,16,1.0],[13,17,1.0],[13,18,1.0],[13,19,1.0],[13,20,1.0],[13,21,0.61],[13,22,0.991],[13,23,0.909],[13,24,1.0],[13,25,0.997],[13,26,1.0],[14,15,1.0],[14,16,1.0],[14,17,1.0],[14,18,1.0],[14,19,1.0],[14,20,1.0],[14,21,0.612],[14,22,0.99],[14,23,0.91],[14,24,1.0],[14,25,0.997],[14,26,1.0],[15,16,1.0],[15,17,1.0],[15,18,1.0],[15,19,1.0],[15,20,1.0],[15,21,0.61],[15,22,0.991],[15,23,0.909],[15,24,1.0],[15,25,0.997],[15,26,1.0],[16,17,1.0],[16,18,1.0],[16,19,1.0],[16,20,1.0],[16,21,0.61],[16,22,0.991],[16,23,0.909],[16,24,1.0],[16,25,0.997],[16,26,1.0],[17,18,1.0],[17,19,1.0],[17,20,1.0],[17,21,0.61],[17,22,0.991],[17,23,0.908],[17,24,1.0],[17,25,0.998],[17,26,1.0],[18,19,1.0],[18,20,1.0],[18,21,0.609],[18,22,0.991],[18,23,0.909],[18,24,1.0],[18,25,0.997],[18,26,1.0],[19,20,1.0],[19,21,0.609],[19,22,0.991],[19,23,0.908],[19,24,1.0],[19,25,0.997],[19,26,1.0],[20,21,0.61],[20,22,0.991],[20,23,0.908],[20,24,1.0],[20,25,0.998],[20,26,1.0],[21,22,0.596],[21,23,0.564],[21,24,0.611],[21,25,0.612],[21,26,0.611],[22,23,0.906],[22,24,0.991],[22,25,0.989],[22,26,0.991],[23,24,0.908],[23,25,0.906],[23,26,0.909],[24,25,0.998],[24,26,1.0],[25,26,0.997]],"circle":1.55,"xlim":[-3.2,3.8],"ylim":[-2.5,3.0]};
+
+      // map data coords -> viewBox units (y flipped)
+      const X = x => (x - G.xlim[0]) * 100;
+      const Y = y => (G.ylim[1] - y) * 100;
+      const VW = (G.xlim[1] - G.xlim[0]) * 100;
+      const VH = (G.ylim[1] - G.ylim[0]) * 100;
+
+      const svg = document.getElementById("net");
+      const NS = "http://www.w3.org/2000/svg";
+
+      const defs = document.createElementNS(NS, "defs");
+      defs.innerHTML = `
+        <radialGradient id="halo">
+          <stop offset="0%" stop-color="#eef2ee" stop-opacity="0.55"/>
+          <stop offset="100%" stop-color="#eef2ee" stop-opacity="0"/>
+        </radialGradient>`;
+      svg.appendChild(defs);
+
+      // correlation edges — width/alpha follow the strength of each correlation
+      const lineGroup = document.createElementNS(NS, "g");
+      for (const [i, j, w] of G.edges) {
+        const ln = document.createElementNS(NS, "line");
+        ln.setAttribute("x1", X(G.nodes[i][0]).toFixed(1));
+        ln.setAttribute("y1", Y(G.nodes[i][1]).toFixed(1));
+        ln.setAttribute("x2", X(G.nodes[j][0]).toFixed(1));
+        ln.setAttribute("y2", Y(G.nodes[j][1]).toFixed(1));
+        ln.setAttribute("stroke", "var(--line)");
+        ln.setAttribute("stroke-width", (0.66 * (0.4 + 1.2 * w)).toFixed(2));
+        ln.setAttribute("stroke-opacity", (0.25 + 0.55 * w).toFixed(2));
+        lineGroup.appendChild(ln);
+      }
+      svg.appendChild(lineGroup);
+
+      // faint head-silhouette circle
+      const circ = document.createElementNS(NS, "circle");
+      circ.setAttribute("cx", X(0).toFixed(1));
+      circ.setAttribute("cy", Y(0).toFixed(1));
+      circ.setAttribute("r", (G.circle * 100).toFixed(1));
+      circ.setAttribute("fill", "none");
+      circ.setAttribute("stroke", "var(--line)");
+      circ.setAttribute("stroke-width", "0.25");
+      circ.setAttribute("stroke-opacity", "0.3");
+      svg.appendChild(circ);
+
+      // sensors: soft halo + outer ring + solid dot
+      const nodeGroup = document.createElementNS(NS, "g");
+      for (const [x, y] of G.nodes) {
+        const cx = X(x).toFixed(1), cy = Y(y).toFixed(1);
+        const mk = (r, attrs) => {
+          const c = document.createElementNS(NS, "circle");
+          c.setAttribute("cx", cx); c.setAttribute("cy", cy); c.setAttribute("r", r);
+          for (const [k, v] of Object.entries(attrs)) c.setAttribute(k, v);
+          nodeGroup.appendChild(c);
+        };
+        mk(9, { fill: "url(#halo)" });
+        mk(4.4, { fill: "none", stroke: "var(--line)", "stroke-width": 0.4, "stroke-opacity": 0.3 });
+        mk(2.1, { fill: "#eef2ee" });
+      }
+      svg.appendChild(nodeGroup);
+
+      // ---- gold photons on hover ------------------------------------------
+      const art = document.getElementById("art");
+      const canvas = document.getElementById("fx");   // persistent, dissolving trails
+      const canvas2 = document.getElementById("fx2"); // photon heads, wiped every frame
+      const ctx = canvas.getContext("2d");
+      const ctx2 = canvas2.getContext("2d");
+      const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      // clip each edge to the visible window so photons never travel off-screen
+      function clipSeg(x1, y1, x2, y2) {
+        let t0 = 0, t1 = 1;
+        const dx = x2 - x1, dy = y2 - y1;
+        for (const [p, q] of [[-dx, x1], [dx, VW - x1], [-dy, y1], [dy, VH - y1]]) {
+          if (p === 0) { if (q < 0) return null; continue; }
+          const r = q / p;
+          if (p < 0) { if (r > t1) return null; if (r > t0) t0 = r; }
+          else       { if (r < t0) return null; if (r < t1) t1 = r; }
+        }
+        return [x1 + t0 * dx, y1 + t0 * dy, x1 + t1 * dx, y1 + t1 * dy];
+      }
+
+      const segs = [];   // visible portions of edges, in viewBox units
+      for (const [i, j, w] of G.edges) {
+        const c = clipSeg(X(G.nodes[i][0]), Y(G.nodes[i][1]), X(G.nodes[j][0]), Y(G.nodes[j][1]));
+        if (!c) continue;
+        const len = Math.hypot(c[2] - c[0], c[3] - c[1]);
+        if (len > 8) segs.push({ c, len, w: 0.66 * (0.4 + 1.2 * w) }); // same width as the SVG line
+      }
+      let scale = 1, wpx = 0, hpx = 0, dpr = 1;
+      function rebuild() {
+        dpr = Math.min(devicePixelRatio || 1, 2);
+        const box = art.getBoundingClientRect();
+        wpx = box.width; hpx = box.height;
+        canvas.width = canvas2.width = Math.round(wpx * dpr);
+        canvas.height = canvas2.height = Math.round(hpx * dpr);
+        scale = wpx / VW;
+        ctx.setTransform(dpr * scale, 0, 0, dpr * scale, 0, 0);
+        ctx2.setTransform(dpr * scale, 0, 0, dpr * scale, 0, 0);
+      }
+      new ResizeObserver(rebuild).observe(art);
+      rebuild();
+
+      // pre-rendered glow sprite for the photon head
+      const sprite = document.createElement("canvas");
+      {
+        const S = 64, c2 = sprite.getContext("2d");
+        sprite.width = sprite.height = S;
+        const g = c2.createRadialGradient(S / 2, S / 2, 0, S / 2, S / 2, S / 2);
+        g.addColorStop(0, "rgba(255,248,220,1)");
+        g.addColorStop(0.18, "rgba(255,222,120,0.9)");
+        g.addColorStop(0.45, "rgba(255,190,60,0.32)");
+        g.addColorStop(1, "rgba(255,180,40,0)");
+        c2.fillStyle = g;
+        c2.fillRect(0, 0, S, S);
+      }
+
+      let photons = [], raf = 0, last = 0, cooldown = 0, cursor = null;
+
+      // distance from a point to a segment, and the parameter t of the
+      // closest approach along it
+      function segDist(seg, x, y) {
+        const [x1, y1, x2, y2] = seg.c;
+        const dx = x2 - x1, dy = y2 - y1;
+        const t = Math.max(0, Math.min(1, ((x - x1) * dx + (y - y1) * dy) / (seg.len * seg.len)));
+        return { d: Math.hypot(x - x1 - t * dx, y - y1 - t * dy), t };
+      }
+
+      const hovered = seg => cursor && segDist(seg, cursor[0], cursor[1]).d < 3.5 / scale;
+
+      function onMove(e) {
+        if (reduceMotion) return;
+        const box = canvas.getBoundingClientRect();
+        cursor = [(e.clientX - box.left) / scale, (e.clientY - box.top) / scale];
+        for (const seg of segs) {
+          if (seg.ph) continue;
+          const { d, t } = segDist(seg, cursor[0], cursor[1]);
+          if (d < 3.5 / scale) {
+            // shoot from under the cursor toward the farther end
+            seg.ph = {
+              seg,
+              pos: t * seg.len,
+              dir: t < 0.5 ? 1 : -1,
+              speed: (1.3 + Math.random() * 0.7) * VW, // vb-units/s
+            };
+            photons.push(seg.ph);
+          }
+        }
+        if (!raf && photons.length) { last = performance.now(); cooldown = 60; raf = requestAnimationFrame(frame); }
+      }
+
+      function frame(now) {
+        const dt = Math.min((now - last) / 1000, 0.022);
+        last = now;
+
+        // dissolve existing trails
+        ctx.globalCompositeOperation = "destination-out";
+        ctx.fillStyle = `rgba(0,0,0,${1 - Math.exp(-dt * 9)})`;
+        ctx.fillRect(0, 0, VW, VH);
+
+        ctx.globalCompositeOperation = "source-over";
+        ctx.lineCap = "round";
+        ctx2.clearRect(0, 0, VW, VH);
+        for (const ph of photons) {
+          const { c, len } = ph.seg;
+          const at = s => [c[0] + (c[2] - c[0]) * s / len, c[1] + (c[3] - c[1]) * s / len];
+          const prev = ph.pos;
+          ph.pos += ph.dir * ph.speed * dt;
+          if (ph.pos >= len || ph.pos <= 0) {
+            ph.pos = Math.max(0, Math.min(ph.pos, len));
+            // bounce off the end while the cursor stays on this line,
+            // otherwise this shot is finished
+            if (hovered(ph.seg)) ph.dir *= -1;
+            else ph.dead = true;
+          }
+          const a = at(prev), b = at(ph.pos);
+          ctx.strokeStyle = "rgba(255,200,72,0.95)";
+          ctx.lineWidth = ph.seg.w * 1.4; // gold-shade the line itself
+          ctx.beginPath();
+          ctx.moveTo(a[0], a[1]);
+          ctx.lineTo(b[0], b[1]);
+          ctx.stroke();
+          const hs = 6.5 / scale;
+          ctx2.drawImage(sprite, b[0] - hs, b[1] - hs, hs * 2, hs * 2);
+        }
+        for (const ph of photons) if (ph.dead) ph.seg.ph = null;
+        photons = photons.filter(p => !p.dead);
+
+        cooldown = photons.length ? 60 : cooldown - 1;
+        if (cooldown > 0) raf = requestAnimationFrame(frame);
+        else { raf = 0; ctx.clearRect(0, 0, VW, VH); ctx2.clearRect(0, 0, VW, VH); }
+      }
+
+      art.addEventListener("pointermove", onMove);
+      art.addEventListener("pointerdown", onMove);
+      art.addEventListener("pointerleave", () => { cursor = null; });
+    </script>
   </body>
-  
 </html>
