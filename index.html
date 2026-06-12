@@ -4,6 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Nick Aldrich</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23002405'/><circle cx='16' cy='16' r='5' fill='%23ffce54'/></svg>" />
     <style>
       :root {
         --bg: #002405;
@@ -75,6 +76,30 @@
 
       #art svg { overflow: hidden; opacity: 0.85; transition: opacity 0.7s ease; }
       #art:hover svg { opacity: 1; }
+
+      /* signature, bottom-right corner */
+      .sig {
+        position: fixed;
+        right: 22px;
+        top: 18px;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 7px;
+        font-family: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+        color: #f0f3f0;
+      }
+      .sig .name { font-size: 13px; letter-spacing: 0.05em; opacity: 0.85; }
+      .sig .links { display: flex; gap: 13px; }
+      .sig a {
+        color: inherit;
+        opacity: 0.6;
+        display: inline-flex;
+        transition: opacity 0.2s ease, color 0.2s ease;
+      }
+      .sig a:hover { opacity: 1; color: var(--gold); }
+      .sig svg { width: 18px; height: 18px; display: block; fill: currentColor; }
     </style>
   </head>
   <body>
@@ -85,6 +110,18 @@
         <canvas id="fx2"></canvas>  <!-- photon heads, wiped every frame -->
       </div>
     </main>
+
+    <footer class="sig">
+      <span class="name">Nick Aldrich</span>
+      <span class="links">
+        <a href="https://linkedin.com/in/naldrich" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.03-3.04-1.85-3.04-1.86 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.55C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.72C24 .77 23.2 0 22.22 0z"/></svg>
+        </a>
+        <a href="mailto:nick@nickaldrich.com" aria-label="Email">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6zm-2 0-8 5-8-5h16zm0 12H4V8l8 5 8-5v10z"/></svg>
+        </a>
+      </span>
+    </footer>
 
     <script>
       // Five EEG renderings from real session data; click the art to cycle.
