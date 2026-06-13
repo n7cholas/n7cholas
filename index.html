@@ -91,7 +91,15 @@
         font-family: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
         color: #f0f3f0;
       }
-      .sig .name { font-size: 13px; letter-spacing: 0.05em; opacity: 0.85; }
+      .sig .name {
+        position: relative;
+        display: inline-block;
+        height: 14px;          /* sets the rendered size of the name */
+        line-height: 0;
+        opacity: 0.85;
+      }
+      .sig .name svg { height: 100%; width: auto; display: block; overflow: visible; }
+      .sig .name canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
       .sig .links { display: flex; gap: 13px; }
       .sig a {
         color: inherit;
@@ -113,7 +121,11 @@
     </main>
 
     <footer class="sig">
-      <span class="name">Nick Aldrich</span>
+      <span class="name" id="sig-name" role="img" aria-label="Nick Aldrich">
+        <svg id="sig-svg" xmlns="http://www.w3.org/2000/svg"></svg>
+        <canvas id="sig-fx"></canvas>
+        <canvas id="sig-fx2"></canvas>
+      </span>
       <span class="links">
         <a href="https://linkedin.com/in/naldrich" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.03-3.04-1.85-3.04-1.86 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.55C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.72C24 .77 23.2 0 22.22 0z"/></svg>
@@ -146,13 +158,12 @@
         connectivity_circle: { fit: "content", w: s => 0.45 + 1.9 * s * s,     o: s => 0.3 + 0.6 * s },
       };
 
+      // Per-letter glyph outlines for the "Nick Aldrich" signature.
+      const LETTERS = {"letters": [{"ch": "N", "paths": [[[6.8, 72.9], [19.3, 72.9], [43.9, 12.9], [43.9, 72.9], [53.4, 72.9], [53.4, 0.0], [40.9, 0.0], [16.3, 60.0], [16.3, 0.0], [6.8, 0.0], [6.8, 72.9]]]}, {"ch": "i", "paths": [[[72.7, 54.7], [95.7, 54.7], [95.7, 7.0], [113.5, 7.0], [113.5, 0.0], [68.9, 0.0], [68.9, 7.0], [86.7, 7.0], [86.7, 47.7], [72.7, 47.7], [72.7, 54.7]], [[86.7, 76.0], [95.7, 76.0], [95.7, 64.6], [86.7, 64.6], [86.7, 76.0]]]}, {"ch": "c", "paths": [[[172.2, 2.8], [168.5, 0.9], [164.8, -0.4], [160.9, -1.2], [156.9, -1.4], [145.6, 0.5], [137.1, 6.2], [131.7, 15.3], [129.9, 27.3], [131.7, 39.3], [137.1, 48.4], [145.6, 54.1], [156.9, 56.0], [160.8, 55.7], [164.6, 55.0], [168.4, 53.7], [172.2, 51.8], [172.2, 42.4], [168.7, 45.1], [165.1, 47.0], [161.2, 48.0], [156.9, 48.4], [149.5, 47.0], [143.9, 42.9], [140.5, 36.3], [139.4, 27.3], [140.6, 18.3], [144.0, 11.7], [149.5, 7.6], [156.9, 6.2], [161.4, 6.6], [165.3, 7.6], [168.9, 9.5], [172.2, 12.1], [172.2, 2.8]]]}, {"ch": "k", "paths": [[[192.1, 76.0], [201.4, 76.0], [201.4, 32.0], [225.0, 54.7], [235.9, 54.7], [214.4, 34.1], [239.3, 0.0], [228.3, 0.0], [208.1, 28.2], [201.4, 21.9], [201.4, 0.0], [192.1, 0.0], [192.1, 76.0]]]}, {"ch": "A", "paths": [[[331.1, 64.2], [320.7, 26.9], [341.5, 26.9], [331.1, 64.2]], [[325.2, 72.9], [337.1, 72.9], [359.4, 0.0], [349.2, 0.0], [343.9, 19.0], [318.3, 19.0], [313.0, 0.0], [302.8, 0.0], [325.2, 72.9]]]}, {"ch": "l", "paths": [[[392.4, 19.8], [393.0, 14.5], [394.7, 10.7], [397.4, 8.4], [401.2, 7.6], [411.7, 7.6], [411.7, 0.0], [400.3, 0.0], [393.2, 1.3], [387.9, 5.2], [384.6, 11.4], [383.4, 19.8], [383.4, 69.5], [369.0, 69.5], [369.0, 76.5], [392.4, 76.5], [392.4, 19.8]]]}, {"ch": "d", "paths": [[[463.3, 47.7], [463.3, 76.0], [472.3, 76.0], [472.3, 0.0], [463.3, 0.0], [463.3, 6.9], [460.7, 3.3], [457.3, 0.7], [453.3, -0.9], [448.7, -1.4], [439.9, 0.5], [433.1, 6.3], [428.9, 15.4], [427.4, 27.5], [428.9, 39.4], [433.2, 48.4], [439.9, 54.1], [448.7, 56.0], [453.4, 55.5], [457.4, 53.9], [460.8, 51.3], [463.3, 47.7]], [[436.9, 27.3], [437.7, 18.1], [440.2, 11.5], [444.3, 7.5], [450.0, 6.2], [455.8, 7.5], [459.9, 11.6], [462.5, 18.2], [463.3, 27.3], [462.5, 36.4], [459.9, 43.0], [455.8, 47.1], [450.0, 48.4], [444.3, 47.1], [440.2, 43.1], [437.7, 36.5], [436.9, 27.3]]]}, {"ch": "r", "paths": [[[538.0, 43.4], [535.1, 45.3], [532.2, 46.7], [529.1, 47.4], [525.6, 47.7], [518.2, 46.4], [512.8, 42.4], [509.5, 36.0], [508.3, 27.2], [508.3, 0.0], [499.3, 0.0], [499.3, 54.7], [508.3, 54.7], [508.3, 44.0], [511.2, 49.1], [515.2, 52.9], [520.4, 55.2], [526.3, 56.0], [529.5, 55.8], [532.5, 55.2], [535.3, 54.1], [538.0, 52.6], [538.0, 43.4]]]}, {"ch": "i", "paths": [[[554.3, 54.7], [577.3, 54.7], [577.3, 7.0], [595.2, 7.0], [595.2, 0.0], [550.5, 0.0], [550.5, 7.0], [568.4, 7.0], [568.4, 47.7], [554.3, 47.7], [554.3, 54.7]], [[568.4, 76.0], [577.3, 76.0], [577.3, 64.6], [568.4, 64.6], [568.4, 76.0]]]}, {"ch": "c", "paths": [[[653.9, 2.8], [650.2, 0.9], [646.4, -0.4], [642.5, -1.2], [638.6, -1.4], [627.3, 0.5], [618.7, 6.2], [613.4, 15.3], [611.6, 27.3], [613.4, 39.3], [618.7, 48.4], [627.3, 54.1], [638.6, 56.0], [642.5, 55.7], [646.3, 55.0], [650.1, 53.7], [653.9, 51.8], [653.9, 42.4], [650.3, 45.1], [646.7, 47.0], [642.9, 48.0], [638.6, 48.4], [631.1, 47.0], [625.6, 42.9], [622.2, 36.3], [621.1, 27.3], [622.2, 18.3], [625.6, 11.7], [631.1, 7.6], [638.6, 6.2], [643.0, 6.6], [647.0, 7.6], [650.6, 9.5], [653.9, 12.1], [653.9, 2.8]]]}, {"ch": "h", "paths": [[[713.6, 33.9], [713.6, 0.0], [704.5, 0.0], [704.5, 33.9], [703.9, 40.3], [701.9, 44.7], [698.6, 47.3], [693.8, 48.2], [688.3, 47.1], [684.1, 43.7], [681.6, 38.3], [680.8, 30.9], [680.8, 0.0], [671.8, 0.0], [671.8, 76.0], [680.8, 76.0], [680.8, 46.5], [683.6, 50.6], [687.3, 53.6], [691.7, 55.4], [697.0, 56.0], [704.3, 54.6], [709.4, 50.5], [712.5, 43.6], [713.6, 33.9]]]}], "bbox": [6.8, -1.4, 713.6, 76.5]};
+
       const NS = "http://www.w3.org/2000/svg";
       const svg = document.getElementById("net");
       const art = document.getElementById("art");
-      const canvas = document.getElementById("fx");
-      const canvas2 = document.getElementById("fx2");
-      const ctx = canvas.getContext("2d");
-      const ctx2 = canvas2.getContext("2d");
       const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
       // Bounding box of all drawn geometry in data space (for "content" fit).
@@ -231,8 +242,6 @@
       }
 
       // ---- per-graphic build: SVG content + photon tracks -----------------
-      let tracks = [];   // current graphic's photon tracks (clipped polylines)
-
       function buildGraphic(g) {
         const fit = makeFit(g), st = STYLE[g.id];
         const map = poly => poly.map(([x, y]) => [fit.X(x), fit.Y(y)]);
@@ -322,7 +331,7 @@
 
         // photon tracks: every stroke (drawn or not), clipped, as a polyline
         // with cumulative arc length so a photon can run end-to-end along it.
-        tracks = [];
+        const tracks = [];
         for (const sObj of g.strokes) {
           const width = st.w(sObj.s) * 1.4;
           for (const piece of clipPolyline(map(sObj.pts), fit.rect)) {
@@ -333,11 +342,7 @@
             if (len > 6) tracks.push({ pts: piece, cum, len, w: width, ph: null });
           }
         }
-
-        // clear any in-flight photons from the previous graphic
-        photons = [];
-        ctx.clearRect(0, 0, VW, VH);
-        ctx2.clearRect(0, 0, VW, VH);
+        return tracks;
       }
 
       // position along a track polyline at arc-length d -> [x,y]
@@ -365,21 +370,7 @@
         return { d: best, at: bd };
       }
 
-      // ---- canvas sizing ---------------------------------------------------
-      let scale = 1, dpr = 1;
-      function resize() {
-        dpr = Math.min(devicePixelRatio || 1, 2);
-        const box = art.getBoundingClientRect();
-        canvas.width = canvas2.width = Math.round(box.width * dpr);
-        canvas.height = canvas2.height = Math.round(box.height * dpr);
-        scale = box.width / VW;
-        ctx.setTransform(dpr * scale, 0, 0, dpr * scale, 0, 0);
-        ctx2.setTransform(dpr * scale, 0, 0, dpr * scale, 0, 0);
-      }
-      new ResizeObserver(resize).observe(art);
-      resize();
-
-      // pre-rendered glow sprite for the photon head
+      // pre-rendered glow sprite for the photon head (shared by all fields)
       const sprite = document.createElement("canvas");
       {
         const S = 64, c2 = sprite.getContext("2d");
@@ -393,79 +384,115 @@
         c2.fillRect(0, 0, S, S);
       }
 
-      // ---- photon engine ---------------------------------------------------
-      let photons = [], raf = 0, last = 0, cooldown = 0, cursor = null;
-      const HIT = () => 3.5 / scale;
+      // ---- a reusable photon "field" over one host element ----------------
+      // Drives a pair of canvases (dissolving trails + photon heads) whose
+      // coordinate system is the host's viewBox [ox,oy, ox+VW, oy+VH].
+      // Hovering a track shoots a gold photon that traces that line and
+      // bounces end-to-end while the cursor stays on it.
+      function makeField(host, fxEl, fx2El, view) {
+        const { ox = 0, oy = 0, VW, VH, headPx = 6.5, bounce = true } = view;
+        const ctx = fxEl.getContext("2d");
+        const ctx2 = fx2El.getContext("2d");
+        let scale = 1, dpr = 1, tracks = [], photons = [], raf = 0, last = 0, cooldown = 0, cursor = null;
 
-      const onTrack = tr => cursor && trackDist(tr, cursor[0], cursor[1]).d < HIT();
-
-      function onMove(e) {
-        if (reduceMotion) return;
-        const box = canvas.getBoundingClientRect();
-        cursor = [(e.clientX - box.left) / scale, (e.clientY - box.top) / scale];
-        for (const tr of tracks) {
-          if (tr.ph) continue;
-          const { d, at: pos } = trackDist(tr, cursor[0], cursor[1]);
-          if (d < HIT()) {
-            // shoot from under the cursor toward the farther end of THIS line
-            tr.ph = { tr, pos, dir: pos < tr.len / 2 ? 1 : -1,
-                      speed: (1.3 + Math.random() * 0.7) * VW };
-            photons.push(tr.ph);
-          }
+        function resize() {
+          dpr = Math.min(devicePixelRatio || 1, 2);
+          const box = fxEl.getBoundingClientRect();
+          if (!box.width) return;
+          fxEl.width = fx2El.width = Math.round(box.width * dpr);
+          fxEl.height = fx2El.height = Math.round(box.height * dpr);
+          scale = box.width / VW;
+          const t = dpr * scale;
+          ctx.setTransform(t, 0, 0, t, -ox * t, -oy * t);
+          ctx2.setTransform(t, 0, 0, t, -ox * t, -oy * t);
         }
-        if (!raf && photons.length) { last = performance.now(); cooldown = 60; raf = requestAnimationFrame(frame); }
+        new ResizeObserver(resize).observe(fxEl);
+        resize();
+
+        const hit = () => 3.5 / scale;
+        const onTrack = tr => cursor && trackDist(tr, cursor[0], cursor[1]).d < hit();
+
+        function onMove(e) {
+          if (reduceMotion) return;
+          const box = fxEl.getBoundingClientRect();
+          cursor = [(e.clientX - box.left) / scale + ox, (e.clientY - box.top) / scale + oy];
+          for (const tr of tracks) {
+            if (tr.ph) continue;
+            const { d, at: pos } = trackDist(tr, cursor[0], cursor[1]);
+            if (d < hit()) {
+              // shoot from under the cursor toward the farther end of THIS line
+              tr.ph = { tr, pos, dir: pos < tr.len / 2 ? 1 : -1,
+                        speed: (1.3 + Math.random() * 0.7) * VW };
+              photons.push(tr.ph);
+            }
+          }
+          if (!raf && photons.length) { last = performance.now(); cooldown = 60; raf = requestAnimationFrame(frame); }
+        }
+
+        function frame(now) {
+          const dt = Math.min((now - last) / 1000, 0.022);
+          last = now;
+
+          // dissolve existing trails
+          ctx.globalCompositeOperation = "destination-out";
+          ctx.fillStyle = `rgba(0,0,0,${1 - Math.exp(-dt * 9)})`;
+          ctx.fillRect(ox, oy, VW, VH);
+
+          ctx.globalCompositeOperation = "source-over";
+          ctx.lineCap = "round";
+          ctx.lineJoin = "round";
+          ctx2.clearRect(ox, oy, VW, VH);
+
+          for (const ph of photons) {
+            const tr = ph.tr;
+            const prev = ph.pos;
+            ph.pos += ph.dir * ph.speed * dt;
+            if (ph.pos >= tr.len || ph.pos <= 0) {
+              ph.pos = Math.max(0, Math.min(ph.pos, tr.len));
+              if (bounce && onTrack(tr)) ph.dir *= -1;   // bounce while hovered
+              else ph.dead = true;                       // otherwise the shot is spent
+            }
+            // gold-shade the line itself between prev and now, following vertices
+            ctx.strokeStyle = "rgba(255,200,72,0.95)";
+            ctx.lineWidth = tr.w;
+            ctx.beginPath();
+            const lo = Math.min(prev, ph.pos), hi = Math.max(prev, ph.pos);
+            const a = at(tr, lo);
+            ctx.moveTo(a[0], a[1]);
+            for (let i = 0; i < tr.cum.length; i++)
+              if (tr.cum[i] > lo && tr.cum[i] < hi) ctx.lineTo(tr.pts[i][0], tr.pts[i][1]);
+            const b = at(tr, hi);
+            ctx.lineTo(b[0], b[1]);
+            ctx.stroke();
+            // bright head sprite on its own canvas
+            const head = at(tr, ph.pos), hs = headPx / scale;
+            ctx2.drawImage(sprite, head[0] - hs, head[1] - hs, hs * 2, hs * 2);
+          }
+          for (const ph of photons) if (ph.dead) ph.tr.ph = null;
+          photons = photons.filter(p => !p.dead);
+
+          cooldown = photons.length ? 60 : cooldown - 1;
+          if (cooldown > 0) raf = requestAnimationFrame(frame);
+          else { raf = 0; ctx.clearRect(ox, oy, VW, VH); ctx2.clearRect(ox, oy, VW, VH); }
+        }
+
+        host.addEventListener("pointermove", onMove);
+        host.addEventListener("pointerleave", () => { cursor = null; });
+
+        return {
+          resize,
+          setTracks(arr) {
+            tracks = arr; photons = [];
+            ctx.clearRect(ox, oy, VW, VH); ctx2.clearRect(ox, oy, VW, VH);
+          },
+        };
       }
 
-      function frame(now) {
-        const dt = Math.min((now - last) / 1000, 0.022);
-        last = now;
-
-        // dissolve existing trails
-        ctx.globalCompositeOperation = "destination-out";
-        ctx.fillStyle = `rgba(0,0,0,${1 - Math.exp(-dt * 9)})`;
-        ctx.fillRect(0, 0, VW, VH);
-
-        ctx.globalCompositeOperation = "source-over";
-        ctx.lineCap = "round";
-        ctx.lineJoin = "round";
-        ctx2.clearRect(0, 0, VW, VH);
-
-        for (const ph of photons) {
-          const tr = ph.tr;
-          const prev = ph.pos;
-          ph.pos += ph.dir * ph.speed * dt;
-          if (ph.pos >= tr.len || ph.pos <= 0) {
-            ph.pos = Math.max(0, Math.min(ph.pos, tr.len));
-            if (onTrack(tr)) ph.dir *= -1;   // bounce while hovered
-            else ph.dead = true;             // otherwise the shot is spent
-          }
-          // gold-shade the line itself between prev and now, following vertices
-          ctx.strokeStyle = "rgba(255,200,72,0.95)";
-          ctx.lineWidth = tr.w;
-          ctx.beginPath();
-          const lo = Math.min(prev, ph.pos), hi = Math.max(prev, ph.pos);
-          const a = at(tr, lo);
-          ctx.moveTo(a[0], a[1]);
-          for (let i = 0; i < tr.cum.length; i++)
-            if (tr.cum[i] > lo && tr.cum[i] < hi) ctx.lineTo(tr.pts[i][0], tr.pts[i][1]);
-          const b = at(tr, hi);
-          ctx.lineTo(b[0], b[1]);
-          ctx.stroke();
-          // bright head sprite on its own canvas
-          const head = at(tr, ph.pos), hs = 6.5 / scale;
-          ctx2.drawImage(sprite, head[0] - hs, head[1] - hs, hs * 2, hs * 2);
-        }
-        for (const ph of photons) if (ph.dead) ph.tr.ph = null;
-        photons = photons.filter(p => !p.dead);
-
-        cooldown = photons.length ? 60 : cooldown - 1;
-        if (cooldown > 0) raf = requestAnimationFrame(frame);
-        else { raf = 0; ctx.clearRect(0, 0, VW, VH); ctx2.clearRect(0, 0, VW, VH); }
-      }
-
-      // ---- cycle graphics on click ----------------------------------------
+      // ---- the artwork: cycle five graphics on click ----------------------
+      const artField = makeField(art, document.getElementById("fx"),
+                                 document.getElementById("fx2"), { VW, VH, headPx: 6.5 });
       let gi = 0;
-      buildGraphic(GRAPHICS[gi]);
+      artField.setTracks(buildGraphic(GRAPHICS[gi]));
 
       let downAt = null;
       art.addEventListener("pointerdown", e => { downAt = [e.clientX, e.clientY]; });
@@ -473,15 +500,52 @@
         // treat as a click (not a drag) -> advance to the next graphic
         if (downAt && Math.hypot(e.clientX - downAt[0], e.clientY - downAt[1]) < 6) {
           gi = (gi + 1) % GRAPHICS.length;
-          buildGraphic(GRAPHICS[gi]);
+          artField.setTracks(buildGraphic(GRAPHICS[gi]));
           art.classList.remove("pulse");
           void art.offsetWidth;        // restart the animation
           art.classList.add("pulse");
         }
         downAt = null;
       });
-      art.addEventListener("pointermove", onMove);
-      art.addEventListener("pointerleave", () => { cursor = null; });
+
+      // ---- the signature: photons trace each letter of "Nick Aldrich" -----
+      (function buildSignature() {
+        const P = 10;                                 // glow padding (em*100 units)
+        const [bx0, by0, bx1, by1] = LETTERS.bbox;    // y is up in this data
+        const ox = bx0 - P, VWs = (bx1 - bx0) + 2 * P;
+        const oy = -by1 - P, VHs = (by1 - by0) + 2 * P;
+        const fy = y => -y;                           // em y-up -> screen y-down
+
+        const sigSvg = document.getElementById("sig-svg");
+        sigSvg.setAttribute("viewBox", `${ox.toFixed(1)} ${oy.toFixed(1)} ${VWs.toFixed(1)} ${VHs.toFixed(1)}`);
+
+        const tracks = [];
+        for (const L of LETTERS.letters) {
+          let d = "";
+          for (const contour of L.paths) {
+            // filled glyph (even-odd keeps the counters of A/d/i open)
+            d += "M" + contour.map(([x, y]) => `${x},${fy(y).toFixed(1)}`).join("L") + "Z";
+            // each contour is also a photon track
+            const pts = contour.map(([x, y]) => [x, fy(y)]);
+            const cum = [0];
+            for (let i = 1; i < pts.length; i++)
+              cum.push(cum[i - 1] + Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]));
+            const len = cum[cum.length - 1];
+            if (len > 4) tracks.push({ pts, cum, len, w: 7, ph: null });
+          }
+          const el = document.createElementNS(NS, "path");
+          el.setAttribute("d", d);
+          el.setAttribute("fill", "#f0f3f0");
+          el.setAttribute("fill-rule", "evenodd");
+          sigSvg.appendChild(el);
+        }
+
+        const sigField = makeField(
+          document.getElementById("sig-name"),
+          document.getElementById("sig-fx"), document.getElementById("sig-fx2"),
+          { ox, oy, VW: VWs, VH: VHs, headPx: 2.8, bounce: false });
+        sigField.setTracks(tracks);
+      })();
     </script>
   </body>
 </html>
