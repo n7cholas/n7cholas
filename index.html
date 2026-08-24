@@ -12,7 +12,12 @@
         --gold: #ffce54;
       }
 
-      html, body { height: 100%; }
+      html, body {
+        height: 100%;
+        overflow: hidden;
+        overscroll-behavior: none;
+        touch-action: none;
+      }
 
       body {
         margin: 0;
@@ -20,6 +25,9 @@
         display: grid;
         place-items: center;
         position: relative;
+        -webkit-user-select: none;
+        user-select: none;
+        -webkit-touch-callout: none;
       }
 
       body::before,
@@ -519,6 +527,9 @@
           { ox, oy, VW: VWs, VH: VHs, headPx: 2.8, bounce: false });
         sigField.setTracks(tracks);
       })();
+
+      // iOS Safari still rubber-bands past touch-action/overscroll-behavior
+      document.addEventListener("touchmove", e => { e.preventDefault(); }, { passive: false });
     </script>
   </body>
 </html>
